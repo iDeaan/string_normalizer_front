@@ -1,0 +1,25 @@
+.app-container {
+  padding: 20px;
+}
+
+.actions-list {
+  margin-top: 20px;
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  border: solid 1px;
+  margin-right: 20px;
+  cursor: pointer;
+  background-color: white;
+  transition: 0.5s;
+}
+
+.button:hover {
+  background-color: lightgrey;
+}
+
+.selected-item {
+  font-weight: bold;
+}
