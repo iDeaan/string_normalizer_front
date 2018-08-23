@@ -69,6 +69,7 @@ class App extends Component {
     while ((i < currentIterationArray.length - 1) && !isAllLettersAfterIndexHasSameType(i, currentIterationArray)) {
       const isCurrentElementConsonantLetter = consonantLetters.includes(currentIterationArray[i]);
       const isNextElementConsonantLetter = consonantLetters.includes(currentIterationArray[i + 1]);
+      const before = [...currentIterationArray]; // letters before current iteration
 
       if (isCurrentElementConsonantLetter === isNextElementConsonantLetter) {
         currentIterationArray = moveLetterToEndOfString(i + 1, currentIterationArray);
@@ -76,9 +77,12 @@ class App extends Component {
         i++;
       }
 
+      // push to array of normalize iterations (for display in render)
       normalizingIterations.push({
-        currentIterationItemIndex: i + 1,
-        currentIterationArray,
+        currentIterationItemIndex: i,
+        beforeIteration: [...before],
+        afterIteration: [...currentIterationArray],
+        currentIterationArray: [...currentIterationArray],
       });
     }
 
@@ -103,21 +107,36 @@ class App extends Component {
 
   }
 
+  renderStepByStepNormalizeString(data, isToDisplayAfterIterationData = false) {
+    const { currentIterationItemIndex, beforeIteration, afterIteration } = data;
+    const currentIterationArray = isToDisplayAfterIterationData ? afterIteration : beforeIteration;
+    return (
+      currentIterationArray.map((item, index) =>
+        <span
+          key={index}
+          className={index === currentIterationItemIndex || index === currentIterationItemIndex + 1 ? 'selected' : ''}
+        >
+          {item}
+        </span>
+      )
+    )
+  }
+
   render() {
-    const { initialString, normalizedString } = this.state;
+    const { initialString, normalizedString, normalizingIterations } = this.state;
 
     return (
       <div className="app-container">
-        <div className="initial-string">
+        <div className="string-information initial-string">
           <div className="text">Generated String:</div>
           <div className="value">{initialString}</div>
         </div>
-        <div className="normalized-string">
-          <div className="text">Normalized String1:</div>
+        <div className="string-information normalized-string">
+          <div className="text">Normalized String:</div>
           <div
             className="value"
             dangerouslySetInnerHTML={{__html:
-                initialString !== normalizedString ? moveVowelLettersToNewString(normalizedString) : normalizedString }}
+                initialString !== normalizedString ? moveVowelLettersToNewString(normalizedString) : '' }}
           />
         </div>
         <div className="actions-list">
@@ -158,6 +177,13 @@ class App extends Component {
             Load from server
           </div>
         </div>
+        <ol className="normalizing-steps">
+          {normalizingIterations.length ? normalizingIterations.map((item, index) =>
+            <li key={index} className="normalize-step">
+              {this.renderStepByStepNormalizeString(item)} ==> {this.renderStepByStepNormalizeString(item, true)}
+            </li>
+          ) : ''}
+        </ol>
       </div>
     );
   }

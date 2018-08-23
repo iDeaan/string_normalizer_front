@@ -23,3 +23,25 @@
 .selected-item {
   font-weight: bold;
 }
+
+.string-information {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.string-information .value {
+    margin-left: 20px;
+}
+
+span.selected {
+    font-weight: bold;
+}
+
+.normalize-step span {
+    margin-right: 2px;
+}
+
+.normalize-step .selected {
+    background-color: #ededed;
+    padding: 0 2px;
+}
