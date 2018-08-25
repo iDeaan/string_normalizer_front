@@ -52,7 +52,13 @@ class App extends Component {
     this.setState({
       normalizedString: currentIterationArray,
       normalizingIterations,
-      normalizingItemIndex: iteration
+      normalizingItemIndex: iteration,
+      notification: normalizingIterations.length === 0
+        ? {
+          message: 'String is already normalized',
+          type: 'success'
+        }
+        : null
     });
   }
 
@@ -112,6 +118,12 @@ class App extends Component {
           };
           this.setState({ notification });
         }
+      }).catch(() => {
+        const notification = {
+          message: 'Oops! Something went wrong!',
+          type: 'error'
+        };
+        this.setState({ notification });
       });
   }
 
@@ -143,6 +155,13 @@ class App extends Component {
           };
           this.setState({ notification });
         }
+      })
+      .catch(() => {
+        const notification = {
+          message: 'Oops! Something went wrong!',
+          type: 'error'
+        };
+        this.setState({ notification });
       });
   }
 
@@ -183,7 +202,7 @@ class App extends Component {
           <Button title="Normalize String" onClick={() => this.handleStringNormalize()} isToRender={!!initialString} />
           <Button
             title="Return to random previous state" onClick={() => this.handleReturnToState()}
-            isToRender={!!normalizedString}
+            isToRender={!!normalizedString && !!normalizingIterations.length}
           />
           <Button
             title="Save to server" onClick={() => this.saveData()}

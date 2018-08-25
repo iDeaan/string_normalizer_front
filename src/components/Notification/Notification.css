@@ -22,3 +22,11 @@
     font-size: 28px;
     cursor: pointer;
 }
+
+.notification-container.error {
+    background-color: #d0121282;
+}
+
+.notification-container.error:hover {
+    background-color: #d01212bf;
+}
