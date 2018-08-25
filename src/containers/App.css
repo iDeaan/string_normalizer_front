@@ -20,6 +20,10 @@
   background-color: lightgrey;
 }
 
+.hidden-button {
+    float: left;
+}
+
 .selected-item {
   font-weight: bold;
 }
