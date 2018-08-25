@@ -2,31 +2,13 @@ import React, { Component } from 'react';
 import './App.css';
 import Notification from "../components/Notification/Notification";
 import Button from "../components/Button/Button";
+import helpers from '../helpers';
+
+const { generateString, normalizeString } = helpers;
 
 const consonantLetters = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z'];
 const vowelLetters = ['a', 'e', 'i', 'o', 'u', 'y'];
 const apiHost = 'http://167.99.34.5/';
-
-const moveLetterToEndOfString = (index, array) => {
-  const movingItem = array[index];
-  array.splice(index, 1);
-  return [...array, movingItem];
-};
-
-const isAllLettersAfterIndexHasSameType = (index, array) => {
-  const firstItemType = consonantLetters.includes(array[index]);
-  let sameTypes = true;
-
-  for (let i = index; i < array.length; i++) {
-    const currentItemType = consonantLetters.includes(array[i]);
-    if (firstItemType !== currentItemType) {
-      sameTypes = false;
-      break;
-    }
-  }
-
-  return sameTypes;
-};
 
 const moveVowelLettersToNewString = (string) => {
   const array = string.split('');
@@ -51,13 +33,8 @@ class App extends Component {
   }
 
   handleStringGenerate() {
-    const lettersToGenerateNumber = Math.floor(Math.random() * 20) + 10;
     const allAvailableLetters = [...consonantLetters, ...vowelLetters];
-    let generatedString = '';
-
-    for (let i = 0; i < lettersToGenerateNumber; i++) {
-      generatedString += allAvailableLetters[Math.floor(Math.random() * allAvailableLetters.length)];
-    }
+    const generatedString = generateString(allAvailableLetters);
 
     this.setState({
       initialString: generatedString,
@@ -69,37 +46,24 @@ class App extends Component {
   handleStringNormalize() {
     const { normalizedString, normalizingItemIndex } = this.state;
 
-    let currentIterationArray = normalizedString.split('');
-    const normalizingIterations = [];
+    const normalizationResultData = normalizeString(normalizedString, normalizingItemIndex);
+    const { currentIterationArray, normalizingIterations, iteration } = normalizationResultData;
 
-    // Letters move logic
-    let i = normalizingItemIndex || 0;
-    while ((i < currentIterationArray.length - 1) && !isAllLettersAfterIndexHasSameType(i, currentIterationArray)) {
-      const isCurrentElementConsonantLetter = consonantLetters.includes(currentIterationArray[i]);
-      const isNextElementConsonantLetter = consonantLetters.includes(currentIterationArray[i + 1]);
-      const before = [...currentIterationArray]; // letters before current iteration
-
-      if (isCurrentElementConsonantLetter === isNextElementConsonantLetter) {
-        currentIterationArray = moveLetterToEndOfString(i + 1, currentIterationArray);
-      } else {
-        i++;
-      }
-
-      // push to array of normalize iterations (for display in render)
-      normalizingIterations.push({
-        currentIterationItemIndex: i,
-        beforeIteration: [...before],
-        afterIteration: [...currentIterationArray],
-        currentIterationArray: [...currentIterationArray],
-      });
-    }
-
-    this.setState({ normalizedString: currentIterationArray.join(''), normalizingIterations, normalizingItemIndex: i });
+    this.setState({
+      normalizedString: currentIterationArray,
+      normalizingIterations,
+      normalizingItemIndex: iteration
+    });
   }
 
   handleReset() {
     const { initialString } = this.state;
-    this.setState({ normalizedString: initialString });
+
+    this.setState({
+      normalizedString: initialString,
+      normalizingIterations: [],
+      normalizingItemIndex: null
+    });
   }
 
   handleReturnToState() {
@@ -208,7 +172,7 @@ class App extends Component {
           />
         </div>
         <div>
-          {normalizingItemIndex
+          {normalizingItemIndex !== null
             ? `Last index worked with: ${normalizingItemIndex}`
             : ''}
         </div>
@@ -218,7 +182,7 @@ class App extends Component {
           <Button title="Reset String" onClick={() => this.handleReset()} isToRender={!!normalizedString} />
           <Button title="Normalize String" onClick={() => this.handleStringNormalize()} isToRender={!!initialString} />
           <Button
-            title="Return to previous state" onClick={() => this.handleReturnToState()}
+            title="Return to random previous state" onClick={() => this.handleReturnToState()}
             isToRender={!!normalizedString}
           />
           <Button
@@ -226,13 +190,21 @@ class App extends Component {
             isToRender={!!normalizedString}
           />
         </div>
-        <ol className="normalizing-steps">
-          {normalizingIterations.length ? normalizingIterations.map((item, index) =>
-            <li key={index} className="normalize-step">
-              {this.renderStepByStepNormalizeString(item)} ==> {this.renderStepByStepNormalizeString(item, true)}
-            </li>
-          ) : ''}
-        </ol>
+        {normalizingIterations.length
+          ? (
+            <div>
+              <h3>Normalization steps:</h3>
+              <ol className="normalizing-steps">
+                {normalizingIterations.map((item, index) =>
+                  <li key={index} className="normalize-step">
+                    {this.renderStepByStepNormalizeString(item)} ==> {this.renderStepByStepNormalizeString(item, true)}
+                  </li>
+                )}
+              </ol>
+            </div>
+          )
+          : ''
+        }
       </div>
     );
   }
