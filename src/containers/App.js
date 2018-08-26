@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
 import Notification from "../components/Notification/Notification";
+import {
+  NormalizingIterations,
+  NormalizedString
+} from "../components/NormalizingRenderData";
 import Button from "../components/Button/Button";
 import helpers from '../helpers';
 
@@ -9,16 +13,6 @@ const { generateString, normalizeString } = helpers;
 const consonantLetters = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z'];
 const vowelLetters = ['a', 'e', 'i', 'o', 'u', 'y'];
 const apiHost = 'http://167.99.34.5/';
-
-const moveVowelLettersToNewString = (string) => {
-  const array = string.split('');
-  let j = array.length - 1;
-  while (vowelLetters.includes(array[j])) {
-    array.splice(j, 0, '_');
-    j--;
-  }
-  return array;
-};
 
 class App extends Component {
   constructor(props) {
@@ -86,21 +80,6 @@ class App extends Component {
       normalizingItemIndex: currentIterationData.currentIterationItemIndex
     });
 
-  }
-
-  renderStepByStepNormalizeString(data, isToDisplayAfterIterationData = false) {
-    const { currentIterationItemIndex, beforeIteration, afterIteration } = data;
-    const currentIterationArray = isToDisplayAfterIterationData ? afterIteration : beforeIteration;
-    return (
-      currentIterationArray.map((item, index) =>
-        <span
-          key={index}
-          className={index === currentIterationItemIndex || index === currentIterationItemIndex + 1 ? 'selected' : ''}
-        >
-          {item}
-        </span>
-      )
-    )
   }
 
   loadData() {
@@ -191,7 +170,6 @@ class App extends Component {
 
   render() {
     const { initialString, normalizedString, normalizingIterations, notification, normalizingItemIndex } = this.state;
-    const normalizedStringWithTransference = moveVowelLettersToNewString(normalizedString);
 
     return (
       <div className="app-container">
@@ -218,14 +196,11 @@ class App extends Component {
         </div>
         <div className="string-information normalized-string">
           <div className="text">Normalized String:</div>
-          <div className="value">
-            {initialString !== normalizedString && normalizedStringWithTransference.length
-              ? normalizedStringWithTransference.map(item =>
-                item === '_' ? <br /> : <span>{item}</span>
-              )
-              : ''
-            }
-          </div>
+          <NormalizedString
+            initialString={initialString}
+            normalizedString={normalizedString}
+            vowelLetters={vowelLetters}
+          />
         </div>
         <div>
           {normalizingItemIndex !== null
@@ -252,21 +227,7 @@ class App extends Component {
             isToRender={!!normalizedString}
           />
         </div>
-        {normalizingIterations.length
-          ? (
-            <div>
-              <h3>Normalization steps:</h3>
-              <ol className="normalizing-steps">
-                {normalizingIterations.map((item, index) =>
-                  <li key={index} className="normalize-step">
-                    {this.renderStepByStepNormalizeString(item)} ==> {this.renderStepByStepNormalizeString(item, true)}
-                  </li>
-                )}
-              </ol>
-            </div>
-          )
-          : ''
-        }
+        <NormalizingIterations normalizingIterations={normalizingIterations} />
       </div>
     );
   }
