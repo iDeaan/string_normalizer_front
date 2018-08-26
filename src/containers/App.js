@@ -14,10 +14,10 @@ const moveVowelLettersToNewString = (string) => {
   const array = string.split('');
   let j = array.length - 1;
   while (vowelLetters.includes(array[j])) {
-    array.splice(j, 0, '<br />');
+    array.splice(j, 0, '_');
     j--;
   }
-  return array.join('');
+  return array;
 };
 
 class App extends Component {
@@ -191,6 +191,7 @@ class App extends Component {
 
   render() {
     const { initialString, normalizedString, normalizingIterations, notification, normalizingItemIndex } = this.state;
+    const normalizedStringWithTransference = moveVowelLettersToNewString(normalizedString);
 
     return (
       <div className="app-container">
@@ -207,7 +208,7 @@ class App extends Component {
           <input
             className="value"
             type="text"
-            value={this.state.initialString}
+            value={initialString}
             onChange={this.handleInputChange}
           />
         </div>
@@ -217,11 +218,14 @@ class App extends Component {
         </div>
         <div className="string-information normalized-string">
           <div className="text">Normalized String:</div>
-          <div
-            className="value"
-            dangerouslySetInnerHTML={{__html:
-                initialString !== normalizedString ? moveVowelLettersToNewString(normalizedString) : '' }}
-          />
+          <div className="value">
+            {initialString !== normalizedString && normalizedStringWithTransference.length
+              ? normalizedStringWithTransference.map(item =>
+                item === '_' ? <br /> : <span>{item}</span>
+              )
+              : ''
+            }
+          </div>
         </div>
         <div>
           {normalizingItemIndex !== null
