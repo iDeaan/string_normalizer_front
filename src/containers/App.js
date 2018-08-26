@@ -112,7 +112,8 @@ class App extends Component {
           this.setState({
             initialString,
             normalizedString,
-            normalizingItemIndex
+            normalizingItemIndex,
+            normalizingIterations: []
           });
         } else {
           const notification = {
