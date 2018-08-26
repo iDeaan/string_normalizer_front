@@ -174,7 +174,12 @@ class App extends Component {
     const inputValue = event.target.value;
 
     if (!inputValue || stringPattern.test(inputValue)) {
-      this.setState({ initialString: inputValue, normalizedString: inputValue, notification: null });
+      this.setState({
+        initialString: inputValue,
+        normalizedString: inputValue,
+        notification: null,
+        normalizingItemIndex: null
+      });
     } else {
       const notification = {
         message: 'Input latin letters only. (lowercase)',
