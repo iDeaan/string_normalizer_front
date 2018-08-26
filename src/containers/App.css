@@ -30,11 +30,17 @@
 
 .string-information {
     display: flex;
+    align-items: center;
     margin-bottom: 20px;
 }
 
 .string-information .value {
     margin-left: 20px;
+}
+
+.string-information.text-input input{
+    padding: 10px;
+    min-width: 300px;
 }
 
 span.selected {

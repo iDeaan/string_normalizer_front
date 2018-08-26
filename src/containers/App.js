@@ -49,17 +49,20 @@ class App extends Component {
     const normalizationResultData = normalizeString(normalizedString, normalizingItemIndex);
     const { currentIterationArray, normalizingIterations, iteration } = normalizationResultData;
 
-    this.setState({
-      normalizedString: currentIterationArray,
-      normalizingIterations,
-      normalizingItemIndex: iteration,
-      notification: normalizingIterations.length === 0
-        ? {
+    if (normalizingIterations.length === 0) {
+      this.setState({
+        notification: {
           message: 'String is already normalized',
           type: 'success'
         }
-        : null
-    });
+      })
+    } else {
+      this.setState({
+        normalizedString: currentIterationArray,
+        normalizingIterations,
+        normalizingItemIndex: iteration
+      });
+    }
   }
 
   handleReset() {
@@ -165,6 +168,21 @@ class App extends Component {
       });
   }
 
+  handleInputChange = (event) => {
+    const stringPattern = /^[a-z]+$/;
+    const inputValue = event.target.value;
+
+    if (!inputValue || stringPattern.test(inputValue)) {
+      this.setState({ initialString: inputValue, normalizedString: inputValue, notification: null });
+    } else {
+      const notification = {
+        message: 'Input latin letters only. (lowercase)',
+        type: 'error'
+      };
+      this.setState({ notification });
+    }
+  };
+
   render() {
     const { initialString, normalizedString, normalizingIterations, notification, normalizingItemIndex } = this.state;
 
@@ -178,6 +196,15 @@ class App extends Component {
             />
           : ''
         }
+        <div className="string-information text-input">
+          <div className="text">Input String (f.e 'toooomaaaaaanyvooowels'):</div>
+          <input
+            className="value"
+            type="text"
+            value={this.state.initialString}
+            onChange={this.handleInputChange}
+          />
+        </div>
         <div className="string-information initial-string">
           <div className="text">Generated String:</div>
           <div className="value">{initialString}</div>
@@ -198,14 +225,20 @@ class App extends Component {
         <div className="actions-list">
           <Button title="Generate String" onClick={() => this.handleStringGenerate()} />
           <Button title="Load from server" onClick={() => this.loadData()} />
-          <Button title="Reset String" onClick={() => this.handleReset()} isToRender={!!normalizedString} />
+          <Button
+            title="Reset String"
+            onClick={() => this.handleReset()}
+            isToRender={!!normalizedString && initialString !== normalizedString}
+          />
           <Button title="Normalize String" onClick={() => this.handleStringNormalize()} isToRender={!!initialString} />
           <Button
-            title="Return to random previous state" onClick={() => this.handleReturnToState()}
+            title="Return to random previous state"
+            onClick={() => this.handleReturnToState()}
             isToRender={!!normalizedString && !!normalizingIterations.length}
           />
           <Button
-            title="Save to server" onClick={() => this.saveData()}
+            title="Save to server"
+            onClick={() => this.saveData()}
             isToRender={!!normalizedString}
           />
         </div>
